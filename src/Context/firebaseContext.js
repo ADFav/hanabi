@@ -35,7 +35,7 @@ class Firebase {
         return this.firestore.doc(documentPath);
     }
 
-    deleteDocument(documentPath){
+    deleteDocument(documentPath) {
         return this.firestore.doc(documentPath).delete()
     }
 
@@ -43,7 +43,8 @@ class Firebase {
         this.getDocument(path).onSnapshot({
             next: snapshot => {
                 callback({ id: snapshot.id, ...snapshot.data() });
-            }, error: error => {
+            },
+            error: error => {
                 throw error;
             }
         });
@@ -55,7 +56,8 @@ class Firebase {
             collection.onSnapshot({
                 next: snapshot => {
                     callback(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-                }, error: error => {
+                },
+                error: error => {
                     console.error("Can't connect listener to collection: ", path);
                     throw error;
                 }
@@ -81,6 +83,25 @@ class Firebase {
         }
     }
 
+    query(collectionPath, queries, callback) {
+        try {
+            const queryReducer = (collection, query) => collection.where(query.field, query.operator, query.value)
+            const queryResult = queries.reduce(queryReducer, this.getCollection(collectionPath));
+            queryResult.onSnapshot({
+                next: snapshot => {
+                    callback(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                },
+                error: error => {
+                    console.error("Can't connect listener to collection: ", collectionPath);
+                    throw error;
+                }
+            });
+        } catch (e) {
+            console.error("Can't connect listener to collection: ", collectionPath);
+            throw e;
+        }
+    }
+
     updateDoc(documentPath, changes) {
         try {
             return this.firestore.doc(documentPath).update(changes);
@@ -91,16 +112,16 @@ class Firebase {
         }
     }
 
-    writeBatch(collectionPath, documents){
-        try{
+    writeBatch(collectionPath, documents) {
+        try {
             const batch = this.firestore.batch();
             const collection = this.firestore.collection(collectionPath);
-            documents.forEach(document =>{
+            documents.forEach(document => {
                 const docId = collection.doc();
                 batch.set(docId, document);
             });
             return batch.commit();
-        } catch(e){
+        } catch (e) {
             console.error("Can't write batch to collection ", collectionPath);
             console.error(e);
             throw e;

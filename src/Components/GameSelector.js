@@ -1,61 +1,48 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { firebaseContext } from '../Context/firebaseContext';
 
 class GameSelector extends React.Component {
     static contextType = firebaseContext;
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = { games: [] };
+        this.userName = 'afav'
     }
 
-    async createGame(players) {
-        const numPlayers = players.length;
-        const cardsPerPlayer = (numPlayers >= 4 ? 4 : 5)
-        const deck = this.shuffleDeck();
-        const dealtCards = deck.splice(0, numPlayers * cardsPerPlayer);
-        const playerMap = players.reduce((result, playerName) => ({ ...result, [playerName]: true }), {});
-        const game = {
-            bombs: 3,
-            clocks: 8,
-            playOrder: players,
-            currentPlayer: players[0],
-            players: playerMap,
-            remainingCards: deck.length
-        }
-
-        const gameId = await this.context.createDoc('games', game);
-        const deckPath = `games/${gameId}/deck`;
-        this.context.writeBatch(deckPath, deck);
-        players.forEach(async playerId => {
-            const handPath = `games/${gameId}/${playerId}-hand`
-            const hand = dealtCards.splice(0,cardsPerPlayer);
-            await this.createHand(handPath, hand);
-        });
+    componentDidMount() {
+        const setGames = games => this.setState({ games });
+        const queries = [
+            { field: `players.${this.userName}`, operator: '==', value: true }
+        ];
+        console.log(this.context);
+        this.context.query('games', queries, setGames);
     }
-
-    async createHand(playerHandPath, cards) {
-        return this.context.writeBatch(playerHandPath, cards)
-    }
-
-    shuffleDeck() {
-        const colors = ['red', 'blue', 'green', 'white', 'yellow'];
-        const numbers = [1, 1, 1, 2, 2, 3, 3, 4, 4, 5];
-        const deck = colors.map(color => numbers.map(number => ({ color, number, knowledge: { color: false, number: false } }))).flat().sort((a, b) => Math.random() - 0.5);
-        console.log(deck.length);
-        return deck;
-    }
-
-    // componentDidMount(){
-    //     this.createGame(['afav','tfav']);
-    // }
 
     render() {
         return (
-            <button onClick={() => this.createGame(['afav', 'eshad', 'jfav'])}>
-                Add Game
-                    </button>
-        );
+            <div >
+                {this.state.games.map(this.gamePreview)}
+            </div>
+            );
+    }
+
+    gamePreview(game) {
+        const gamePrviewStyle = {
+            borderRight: '1px solid black',
+            borderBottom: '1px solid black',
+            borderRadius: '3px'
+        }
+        return (
+            <Link to={`/games/${game.id}`}>
+                <div style={gamePrviewStyle}>
+                    <strong>Players</strong> {game.playOrder.join(', ')}<br />
+                    <strong>Bombs: </strong> {game.bombs} <br />
+                    <strong>Clocks: </strong> {game.clocks} <br />
+                    <strong>Cards: </strong> {game.remainingCards} <br />
+                </div>
+            </Link>);
     }
 }
 
-export default GameSelector;
+export default GameSelector

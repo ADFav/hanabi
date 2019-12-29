@@ -1,5 +1,5 @@
 import React from "react";
-import DiscardedCard from './DiscardedCard';
+import CardPileCard from './CardPileCard';
 
 // import template from "./Card.jsx";
 
@@ -11,9 +11,9 @@ import DiscardedCard from './DiscardedCard';
     number - boolean if number is known
 */
 
-class Discards extends React.Component {
+class CardPile extends React.Component {
     render() {
-        if (this.props.discards) {
+        if (this.props.cards) {
             const suits = ['red', 'white', 'blue', 'green', 'yellow'];
             return suits.map(suit => this.cardPile(suit));
         }
@@ -21,14 +21,13 @@ class Discards extends React.Component {
     }
 
     cardPile(color) {
-        const cards = this.props.discards
+        const cards = this.props.cards
             .filter(card => card.color === color)
             .sort((card1, card2) => card1.number - card2.number);
         return (<div>
-            {cards.map(card => <DiscardedCard {...card} />)}
+            {cards.map(card => <CardPileCard {...card} key={card.id}/>)}
         </div>);
     }
-
 }
 
-export default Discards;
+export default CardPile;

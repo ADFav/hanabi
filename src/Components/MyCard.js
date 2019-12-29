@@ -24,6 +24,7 @@ class MyCard extends Card{
     {...this.props.knowledge}  
     showOptions={this.state.showOptions} 
     discard = {this.props.discard}
+    play = {this.props.play}
     />
 
   get number() {

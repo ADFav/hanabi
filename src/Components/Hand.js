@@ -42,14 +42,21 @@ class Hand extends React.Component {
 
   createCardComponent(card) {
     if (this.isMyHand) {
-      const play = () => {
-
+      const play = async () => {
+        const newCard = await this.props.deal();
+        const handPath = this.props.gameId + "/" + this.props.userId + "-hand";
+        const cardPath = `${handPath}/${card.id}`
+        await Promise.all([
+          this.props.play(card, cardPath),
+              this.context.deleteDocument(cardPath)
+        ]) ;
+        this.addToHand(newCard);
       };
       const discard = async () => {
         const newCard = await this.props.deal();
         const handPath = this.props.gameId + "/" + this.props.userId + "-hand";
         const cardPath = `${handPath}/${card.id}`
-        const newCardId = await this.props.discard(card, cardPath);
+        await this.props.discard(card, cardPath);
         console.log(cardPath);
         await this.context.deleteDocument(cardPath);
         this.addToHand(newCard);
