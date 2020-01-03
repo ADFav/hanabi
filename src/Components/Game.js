@@ -8,8 +8,7 @@ class Game extends React.Component {
     static contextType = firebaseContext;
     constructor(props) {
         super(props);
-        this.state = { style: {} };
-        //    bombs: 0, clocks: 0, remainingCards: 50, currentPlayer: '', players: [] };
+        this.state = { style: this.computeStyles() };
     }
 
     componentDidMount() {

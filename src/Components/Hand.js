@@ -35,9 +35,9 @@ class Hand extends React.Component {
     }
   }
 
-  async addToHand(card){
+  async addToHand(card) {
     const handPath = this.props.gameId + "/" + this.props.userId + "-hand";
-    await this.context.createDoc(handPath,card);
+    await this.context.createDoc(handPath, card);
   }
 
   createCardComponent(card) {
@@ -48,8 +48,8 @@ class Hand extends React.Component {
         const cardPath = `${handPath}/${card.id}`
         await Promise.all([
           this.props.play(card, cardPath),
-              this.context.deleteDocument(cardPath)
-        ]) ;
+          this.context.deleteDocument(cardPath)
+        ]);
         this.addToHand(newCard);
       };
       const discard = async () => {
@@ -62,10 +62,10 @@ class Hand extends React.Component {
         this.addToHand(newCard);
         this.props.addClock();
       };
-      return <MyCard 
-        {...card} 
-        play={play} 
-        discard={discard} 
+      return <MyCard
+        {...card}
+        play={play}
+        discard={discard}
         key={card.id} />
     } else {
       const cardPath = this.props.gameId + "/" + this.props.userId + "-hand/" + card.id;

@@ -2,6 +2,7 @@ import React from "react";
 import app from "firebase/app";
 import auth from "firebase/auth";
 import firestore from "firebase/firestore";
+import * as firebaseui from 'firebaseui'
 
 
 const firebaseConfig = {
@@ -14,13 +15,58 @@ const firebaseConfig = {
     appId: process.env.REACT_APP_APPID
 };
 
+
+
 class Firebase {
     constructor() {
         app.initializeApp(firebaseConfig);
         this.auth = app.auth();
         this.firestore = app.firestore();
         this.MAX_BATCH_SIZE = 50;
+        this.googleAuthProvider = app.auth.GoogleAuthProvider;
     }
+
+    loginWithGoogle() {
+        const provider = new app.auth.FacebookAuthProvider()
+        console.log(provider);
+        // this.auth.signIn
+        // this.auth.signInWithEmailAndPassword('ellen.shadburn@gmail.com', 'abc123456efg').then(console.log).catch(console.error);
+        app.auth().signInWithRedirect(provider).then(userCredential => {
+            console.log(userCredential);
+        }).catch(err => {
+            console.error(err);
+        });
+    }
+
+    signUpWithEmail(email, password, displayName) {
+        this.auth.onAuthStateChanged(change => {
+            if(change){
+                change.updateProfile({ displayName });
+            }
+        })
+        this.auth.createUserWithEmailAndPassword(email, password).then(user => {
+            console.log("User created!");
+        }).catch(err => {
+            console.error(err);
+        });
+    }
+
+    loginWithEmail(email, password){
+        this.auth.signInWithEmailAndPassword(email, password).then(user =>{
+            console.log(user);
+            console.log("Signed in!");
+        }).catch(err =>{
+            console.error(err);
+        });
+    }
+
+    registerAuthListener(callback) {
+        this.auth.onAuthStateChanged(callback);
+    }
+    logout() {
+        this.auth.signOut();
+    }
+
 
     getCollection(collectionPath) {
         try {

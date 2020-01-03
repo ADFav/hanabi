@@ -5,10 +5,13 @@ class GameCreator extends React.Component {
     static contextType = firebaseContext;
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = { players: ['', '','','','']};
     }
 
-    async createGame(players) {
+    async createGame() {
+        const yourUserName = this.context.auth.currentUser.displayName;
+        this.setState(state => this.state.map((name, index) => index === 0 ? yourUserName : name));
+        const players = this.state.players.filter(name => name.length > 0);
         const numPlayers = players.length;
         const cardsPerPlayer = (numPlayers >= 4 ? 4 : 5)
         const deck = this.shuffleDeck();
@@ -45,11 +48,38 @@ class GameCreator extends React.Component {
         return deck;
     }
 
+    updatePlayer2(event) {
+        const player2Name = event.target.value;
+        this.setState(state => state.map((name, index) => index === 1 ? player2Name : name));
+    }
+
+    updatePlayer3(event) {
+        const player3Name = event.target.value;
+        this.setState(state => state.map((name, index) => index === 2 ? player3Name : name));
+    }
+
+    updatePlayer4(event) {
+        const player4Name = event.target.value;
+        this.setState(state => state.map((name, index) => index === 3 ? player4Name : name));
+    }
+
+    updatePlayer5(event) {
+        const player5Name = event.target.value;
+        this.setState(state => state.map((name, index) => index === 4 ? player5Name : name));
+    }
+
     render() {
-        return (
-            <button onClick={() => this.createGame(['afav', 'eshad', 'jfav'])}>
+        const yourUserName = this.context.auth.currentUser.displayName;
+        return (<div >
+            <strong > Player 1 </strong><input value={yourUserName} disabled /> <br />
+            <strong > Player 2 </strong><input onChange={e => this.updatePlayer2(e)} /> < br />
+            <strong > Player 3 </strong><input onChange={e => this.updatePlayer3(e)} /> < br />
+            <strong > Player 4 </strong><input onChange={e => this.updatePlayer4(e)} /> < br />
+            <strong > Player 5 </strong><input onChange={e => this.updatePlayer5(e)} /> < br />
+            <button onClick={() => this.createGame()} >
                 Add Game
-                    </button>
+                </button>
+        </div>
         );
     }
 }

@@ -7,10 +7,12 @@ class GameSelector extends React.Component {
     constructor(props) {
         super(props);
         this.state = { games: [] };
-        this.userName = 'afav'
+        
     }
 
     componentDidMount() {
+        this.userName = this.context.auth.currentUser.displayName;
+        console.log(this.userName);
         const setGames = games => this.setState({ games });
         const queries = [
             { field: `players.${this.userName}`, operator: '==', value: true }
@@ -23,6 +25,9 @@ class GameSelector extends React.Component {
         return (
             <div >
                 {this.state.games.map(this.gamePreview)}
+                <Link to="/newGame">
+                    <button>New Game</button>
+                </Link>
             </div>
             );
     }
@@ -34,7 +39,7 @@ class GameSelector extends React.Component {
             borderRadius: '3px'
         }
         return (
-            <Link to={`/games/${game.id}`}>
+            <Link to={`/games/${game.id}`} key={game.id}>
                 <div style={gamePrviewStyle}>
                     <strong>Players</strong> {game.playOrder.join(', ')}<br />
                     <strong>Bombs: </strong> {game.bombs} <br />
